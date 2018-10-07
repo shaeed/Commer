@@ -1,0 +1,221 @@
+{% load static %}
+{% include 'snackbar.html' %}
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Eclairage India - D-FLAUNT Control Center</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
+		<link rel="stylesheet" href="{% static "assets/css/main.css"  %}"/>
+		<noscript><link rel="stylesheet" href="{% static "assets/css/noscript.css"  %}"/></noscript>
+                                         
+    
+<link rel="stylesheet" href="{% static "jquery-ui/jquery-ui.css" %}">
+
+<script src="{% static "jquery.js" %}"></script>
+<script src="{% static "jquery-ui/jquery-ui.js" %}"></script>
+<script src="{% static "jscolor.js" %}"></script>
+<script>
+	$(function() {
+      window.addEventListener( "pageshow", function ( event ) {
+      var historyTraversal = event.persisted || 
+            ( typeof window.performance != "undefined" && 
+            window.performance.navigation.type === 2 );
+      if ( historyTraversal ) {
+       // Handle page restore.
+       window.location.reload();
+      }
+    });
+            
+		$(".theme-menu").checkboxradio({
+			icon : false
+		});
+       $(".dev-chkbx").checkboxradio({
+			icon : false
+		});
+            
+    
+		
+		//Brightness slider
+		//var brtHandle = $( "#slider-brt-handle" );
+	    $( "#slider-brt" ).slider({
+	    	range: "max",
+	        min: 1,
+	        max: 250,
+	        value: {{brtV}},
+	        stop: function( event, ui ) {
+	        	redirectTheme("brt=" + ui.value);
+	        	}	      
+	    });
+	    
+	    //Speed slider
+	    //var spdHandle = $( "#slider-spd-handle" );
+	    $( "#slider-spd" ).slider({
+	    	range: "max",
+	        min: {{spdVMin}},
+	        max: {{spdVMax}},
+	        value: {{spdV}},
+	        stop: function( event, ui ) {
+	        	redirectTheme("spd=" + ui.value);
+	        	}
+	    });
+            
+        //Initialization / Selection
+        $("#"+$("#selected-theme").val()).prop("checked", true).button("refresh");
+         
+        //Hidden
+        $("#hidden-contents").hide();
+	});
+	
+	function themeSelected(rd){
+		//alert(rd.value);
+		//alert($('input[name="radio-1"]:checked').val());
+		//var data = "theme=" + $('input[name="radio-1"]:checked').val();
+		redirectTheme("");
+	}
+	
+	function colorSelected(clr){
+		var data = "clr=" + $(clr).val();
+		redirectTheme(data);
+	}
+    
+   function devColorSelected(clr, devId){
+		var data = "clr=" + $(clr).val(); 
+		redirectDvc(data, devId);
+	}
+	
+	function redirectTheme(vals){
+		//Get selected theme
+		var thm = "theme=" + $('input[name="radio-1"]:checked').val();
+		var url = "theme?" + thm + "&" + vals;
+		//alert(url);
+		window.location = url;
+	}
+    
+    function devSelected(btn){ 
+       redirectDvc("", btn.value)
+    }
+    
+    function redirectDvc(vals, devId){
+       var url = "device?devid=" + devId + "&" + vals;
+       //alert(url);
+       window.location = url;
+       /*$.get(url, function(data, status){
+          snackMessage(status);
+       });*/
+	}
+</script>
+
+<style type="text/css">
+#theme-list {
+	display: inline-block;
+	vertical-align: top;
+}
+
+label {
+	width: 190px;
+}
+
+#custom-handle {
+	width: 3em;
+	height: 1.6em;
+	top: 50%;
+	margin-top: -.8em;
+	text-align: center;
+	line-height: 1.6em;
+}
+
+.disabledbutton {
+    pointer-events: none;
+    opacity: 0.4;
+}
+</style>
+</head>
+<body class="is-preload">
+    <!-- Wrapper -->
+	<div id="wrapper">
+	<!-- Header -->
+	<header id="header" class="alt">
+		<span class="logo"><img src="{% static "images/2.png" %}" alt="" width="130" height="130"/></span>
+		<h1>D-FLAUNT Control Center</h1>
+		<p>	built by Eclairage India.</p>
+	</header>
+
+	<!-- Nav -->
+	<nav id="nav">
+	<ul>
+		<li><a href="#infrm" class="active">Home</a></li>
+	</ul>
+	</nav>
+
+<!-- Main -->
+<div id="main">
+      
+
+	<!-- First Section -->
+	<section id="infrm" class="main special">
+	<header class="major">
+	   <h2>{{selectedThemeName}}</h2>
+	</header>
+	
+   <!--  Themes   --> 
+    <div style="width: 100%; overflow: auto;">
+		<div id="theme-list" style="width: 260px; float: left;overflow:auto;">
+            {% for theme in themes %}
+                <div><label for="thm-{{theme.themeId}}">{{theme.themeName}}</label>
+                <input class="theme-menu" type="radio" name="radio-1" id="thm-{{theme.themeId}}"
+                onclick="themeSelected(this)" value="{{theme.themeId}}"></div>
+            {% endfor %}
+		</div>
+
+		<div style="margin-left: 300px;width: 320px;">
+          {% if clr != 0 %}	
+          <div id="clr-div" style="width: 100%; overflow: hidden;">
+				<p>
+				Color
+				<input type="text" id="color-value" class="jscolor" value="{{clrV}}" onchange="colorSelected(this)">
+				</p>
+			</div>
+          {% endif %}
+            
+          {% if brt != 0 %}
+          <div id="brt" style="width: 100%; overflow: hidden;">
+              Brightness<div id="slider-brt"></div>
+				<p></p>
+			</div>
+          {% endif %}
+            
+          {% if spd != 0 %}
+          <div id="spd" style="width: 100%; overflow: hidden;">
+				Speed<div id="slider-spd"></div>
+				<p></p>
+			</div>
+          {% endif %}
+		</div>
+	</div>
+   <!--  Themes End   --> 
+   
+	
+
+</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						
+						<p class="copyright">&copy; Eclairage India.</p>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="{% static "assets/js/jquery.scrollex.min.js" %}"></script>
+			<script src="{% static "assets/js/jquery.scrolly.min.js" %}"></script>
+			<script src="{% static "assets/js/browser.min.js" %}"></script>
+			<script src="{% static "assets/js/breakpoints.min.js" %}"></script>
+			<script src="{% static "assets/js/util.js" %}"></script>
+			<script src="{% static "assets/js/main.js" %}"></script>
+    <div id="hidden-contents">
+       <input type="text" id="selected-theme" value="thm-{{selectedTheme}}">
+    </div>
+	</body>
+</html>

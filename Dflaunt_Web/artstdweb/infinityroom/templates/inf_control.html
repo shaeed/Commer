@@ -1,0 +1,268 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Infinity Room</title>
+
+<link rel="stylesheet" href="{% static "jquery-ui/jquery-ui.css" %}">
+
+<script src="{% static "jquery.js" %}"></script>
+<script src="{% static "jquery-ui/jquery-ui.js" %}"></script>
+<script src="{% static "jscolor.js" %}"></script>
+<script>
+	$(function() {
+      window.addEventListener( "pageshow", function ( event ) {
+      var historyTraversal = event.persisted || 
+            ( typeof window.performance != "undefined" && 
+            window.performance.navigation.type === 2 );
+      if ( historyTraversal ) {
+       // Handle page restore.
+       window.location.reload();
+      }
+    });
+            
+		$(".theme-menu").checkboxradio({
+			icon : false
+		});
+       $(".dev-chkbx").checkboxradio({
+			icon : false
+		});
+            
+    
+		
+		//Brightness slider
+		//var brtHandle = $( "#slider-brt-handle" );
+	    $( "#slider-brt" ).slider({
+	    	range: "max",
+	        min: 1,
+	        max: 250,
+	        value: {{brtV}},
+	        stop: function( event, ui ) {
+	        	redirectTheme("brt=" + ui.value);
+	        	}	      
+	    });
+	    
+	    //Speed slider
+	    //var spdHandle = $( "#slider-spd-handle" );
+	    $( "#slider-spd" ).slider({
+	    	range: "max",
+	        min: {{spdVMin}},
+	        max: {{spdVMax}},
+	        value: {{spdV}},
+	        stop: function( event, ui ) {
+	        	redirectTheme("spd=" + ui.value);
+	        	}
+	    });
+            
+        //Initialization / Selection
+        $("#"+$("#selected-theme").val()).prop("checked", true).button("refresh");
+         
+        //Hidden
+        $("#hidden-contents").hide();
+	});
+	
+	function themeSelected(rd){
+		//alert(rd.value);
+		//alert($('input[name="radio-1"]:checked').val());
+		//var data = "theme=" + $('input[name="radio-1"]:checked').val();
+		redirectTheme("");
+	}
+	
+	function colorSelected(clr){
+		var data = "clr=" + $(clr).val();
+		redirectTheme(data);
+	}
+    
+   function devColorSelected(clr, devId){
+		var data = "clr=" + $(clr).val(); 
+		redirectDvc(data, devId);
+	}
+	
+	function redirectTheme(vals){
+		//Get selected theme
+		var thm = "theme=" + $('input[name="radio-1"]:checked').val();
+		var url = "theme?" + thm + "&" + vals;
+		//alert(url);
+		window.location = url;
+	}
+    
+    function devSelected(btn){ 
+       redirectDvc("", btn.value)
+    }
+    
+    function redirectDvc(vals, devId){
+       var url = "device?devid=" + devId + "&" + vals;
+		//alert(url);
+       window.location = url;
+	}
+</script>
+
+<style type="text/css">
+#theme-list {
+	display: inline-block;
+	vertical-align: top;
+}
+
+label {
+	width: 190px;
+}
+
+#custom-handle {
+	width: 3em;
+	height: 1.6em;
+	top: 50%;
+	margin-top: -.8em;
+	text-align: center;
+	line-height: 1.6em;
+}
+
+.disabledbutton {
+    pointer-events: none;
+    opacity: 0.4;
+}
+</style>
+
+</head>
+<body>
+	<div id="title">Infinity Room</div>
+
+	<div style="width: 100%; overflow: hidden;">
+		<div id="theme-list" style="width: 200px; float: left;">
+            {% for theme in themes %}
+                <label for="thm-{{theme.themeId}}">{{theme.themeName}}</label>
+                <input class="theme-menu" type="radio" name="radio-1" id="thm-{{theme.themeId}}"
+                onclick="themeSelected(this)" value="{{theme.themeId}}">
+            {% endfor %}
+		</div>
+
+		<div style="margin-left: 260px;width: 320px;">
+          {% if clr == 0 %}		
+			<div id="clr-div" style="width: 100%; overflow: hidden;" class="disabledbutton">
+          {% else %}
+          <div id="clr-div" style="width: 100%; overflow: hidden;">
+          {% endif %}
+				<p>
+				<div style="float: left;">Color:</div> 
+				<div style="margin-left: 100px; width: 200px;">
+					<input type="text" id="color-value" class="jscolor" value="{{clrV}}" onchange="colorSelected(this)">
+				</div>
+				</p>
+			</div>
+            
+          {% if brt == 0 %}		
+			<div id="brt" style="width: 100%; overflow: hidden;" class="disabledbutton">
+          {% else %}
+          <div id="brt" style="width: 100%; overflow: hidden;">
+          {% endif %}
+				<p>
+				<div style="float: left;">Brightness:</div> 
+				<div id="slider-brt" style="margin-left: 100px; width: 200px;"></div>
+				</p>
+			</div>
+            
+          {% if spd == 0 %}		
+			<div id="spd" style="width: 100%; overflow: hidden;" class="disabledbutton">
+          {% else %}
+          <div id="spd" style="width: 100%; overflow: hidden;">
+          {% endif %}
+			   <p>
+				<div style="float: left;">Speed:</div> 
+				<div id="slider-spd" style="margin-left: 100px; width: 200px;"></div>
+				</p>
+			</div>
+		</div>
+	</div>
+   <!-- End Infinity Room -->
+   
+   <hr>
+   <div>
+      {% for device in devices %}
+      <label for="dev-{{device.devId}}">{{device.name}}</label>
+      <input class="dev-chkbx" type="checkbox" name="dev-{{device.devId}}" id="dev-{{device.devId}}"
+      onclick="devSelected(this)" value="{{device.devId}}">
+      
+      {% if device.state == True %}                          
+      <div id="dvc-div-{{device.devId}}">
+      {% else %}
+      <div id="dvc-div-{{device.devId}}" class="disabledbutton">
+      {% endif %}
+          {% if device.option.clr != 0 %}		
+			<div class="dvc-clr-div">
+				<p>
+				<div style="float: left;">Color:</div> 
+				<div style="margin-left: 100px; width: 200px;">
+					<input type="button" id="dvc-clr-{{device.devId}}" class="jscolor" value="{{device.clr}}" onchange="devColorSelected(this, {{device.devId}})">
+				</div>
+				</p>
+			</div>
+          {% endif %}
+            
+          {% if device.option.brt != 0 %}		
+          <div class="dvc-brt-div">
+				<p>
+				<div style="float: left;">Brightness:</div> 
+				<div id="dvc-brt-{{device.devId}}" class="dvc-brt-sldr" style="margin-left: 100px; width: 200px;"></div>
+				</p>
+			</div>
+          {% endif %}
+            
+          {% if device.option.spd != 0 %}		
+          <div class="dvc-spd-div">
+			   <p>
+				<div style="float: left;">Speed:</div> 
+				<div id="dvc-spd-{{device.devId}}" class="dvc-spd-sldr" style="margin-left: 100px; width: 200px;"></div>
+				</p>
+			</div>
+          {% endif %}
+          
+          <script>
+              $( function() {
+                 //Enable button
+                 {% if device.state %}	
+                 $("#dev-{{device.devId}}").prop("checked", true).button("refresh");
+                 {% else %}
+                 $("#dev-{{device.devId}}").prop("checked", false).button("refresh");
+                 {% endif %}
+                 
+                {% if device.option.brt != 0 %}
+                //Brightness slider
+	             $("#dvc-brt-{{device.devId}}").slider({
+	    	        range: "max",
+	               min: 1,
+	               max: 250,
+	               value: {{device.brt}},
+	               stop: function( event, ui ) {
+	        	       redirectDvc("brt=" + ui.value, {{device.devId}});
+	        	     }	      
+	             });
+                {% endif %}
+
+                {% if device.option.spd != 0 %}
+                //Speed slider
+	             $("#dvc-spd-{{device.devId}}").slider({
+	    	        range: "max",
+	               min: {{device.spdMin}},
+	               max: {{device.spdMax}},
+	               value: {{device.spd}},
+	               stop: function( event, ui ) {
+	        	       redirectDvc("spd=" + ui.value, {{device.devId}});
+	        	     }
+	             });
+                {% endif %}
+              });
+          </script>          
+		</div>
+                          
+      {% endfor %}
+   
+   </div>
+
+
+<div id="hidden-contents">
+    <input type="text" id="selected-theme" value="thm-{{selectedTheme}}">
+</div>
+
+</body>
+</html>

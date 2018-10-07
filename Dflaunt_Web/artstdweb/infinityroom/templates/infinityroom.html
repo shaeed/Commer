@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Infinity Room</title>
+
+<link rel="stylesheet" href="../static/jquery-ui/jquery-ui.css">
+
+<script src="../static/jquery.js"></script>
+<script src="../static/jquery-ui/jquery-ui.js"></script>
+<script src="../static/jscolor.js"></script>
+<script>
+	$(function() {
+		$(".theme-menu").checkboxradio({
+			icon : false
+		});
+		
+		//Brightness slider
+		var brtHandle = $( "#slider-brt-handle" );
+	    $( "#slider-brt" ).slider({
+	    	range: "max",
+	        min: 1,
+	        max: 250,
+	        value: 2,
+	        stop: function( event, ui ) {
+	        	redirectTheme("brt=" + ui.value);
+	        	}	      
+	    });
+	    
+	    //Speed slider
+	    var spdHandle = $( "#slider-spd-handle" );
+	    $( "#slider-spd" ).slider({
+	    	range: "max",
+	        min: 1,
+	        max: 100,
+	        value: 2,
+	        stop: function( event, ui ) {
+	        	redirectTheme("spd=" + ui.value);
+	        	}
+	    });
+	});
+	
+	function themeSelected(rd){
+		//alert(rd.value);
+		//alert($('input[name="radio-1"]:checked').val());
+		//var data = "theme=" + $('input[name="radio-1"]:checked').val();
+		redirectTheme("");
+	}
+	
+	function colorSelected(clr){
+		var data = "clr=" + $(clr).val();
+		alert(data);
+	}
+	
+	function redirectTheme(vals){
+		//Get selected theme
+		var thm = "theme=" + $('input[name="radio-1"]:checked').val();
+		var url = "theme?" + thm + "&" + vals;
+		alert(url);
+		//window.location = url;
+	}
+</script>
+
+<style type="text/css">
+#theme-list {
+	display: inline-block;
+	vertical-align: top;
+}
+
+label {
+	width: 190px;
+}
+
+#custom-handle {
+	width: 3em;
+	height: 1.6em;
+	top: 50%;
+	margin-top: -.8em;
+	text-align: center;
+	line-height: 1.6em;
+}
+
+.disabledbutton {
+    pointer-events: none;
+    opacity: 0.4;
+}
+</style>
+
+</head>
+<body>
+	<div id="title">Infinity Room</div>
+
+	<div style="width: 100%; overflow: hidden;">
+		<div id="theme-list" style="width: 200px; float: left;">
+			<label for="strobe">Strobe</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="strobe" value="shaeed" onclick="themeSelected(this)">
+			<label for="main-run">Main Run</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="main-run" value="main run">
+			<label for="rainbow">Rainbow</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="rainbow" value="rainbow">
+			<label for="all-white">All White</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="all-white" value="white">
+			<label for="fade-in">Fade In</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="fade-in" value="fade">
+			<label for="fade-out">Fade Out</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="fade-out" value="fade out">
+			<label for="spiral">Spiral</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="spiral" value="spiral-shaeed">
+			<label for="zoom">Zoom</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="zoom" value="zoom">
+			<label for="rows-col-blink">Rows Columns Blink</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="rows-col-blink" value="blink">
+			<label for="night-stars">Night full of stars</label>
+			<input class="theme-menu" type="radio" name="radio-1" id="night-stars" value=night>
+		</div>
+
+		<div style="margin-left: 260px;width: 320px;">			
+			<div id="clr-div" style="width: 100%; overflow: hidden;">
+				<p>
+				<div style="float: left;">Color:</div> 
+				<div style="margin-left: 100px; width: 200px;">
+					<input type="text" id="color-value" class="jscolor" value="85FF40" onchange="colorSelected(this)">
+				</div>
+				</p>
+			</div>
+			<div id="brt" style="width: 100%; overflow: hidden;">
+				<p>
+				<div style="float: left;">Brightness:</div> 
+				<div id="slider-brt" style="margin-left: 100px; width: 200px;"></div>
+				</p>
+			</div>
+			<div id="brt" style="overflow: hidden;">
+			<p>
+				<div style="float: left;">Speed:</div> 
+				<div id="slider-spd" style="margin-left: 100px; width: 200px;"></div>
+				</p>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
